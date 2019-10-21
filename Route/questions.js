@@ -26,9 +26,9 @@ module.exports.submit_answer = (req, res, next)=>{
 }
 
 module.exports.total_survey = (req, res, next)=>{
-	const role_id = req.user.role_id
+	const user = req.user;
 
-	Ques.total_survey(role_id)
+	Ques.total_survey(user)
 	.then((Data)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));
@@ -54,6 +54,15 @@ module.exports.survey_details = (req, res, next)=>{
 module.exports.survey_submited_list = (req, res, next)=>{
     const survey_id = req.params.survey_id;   
 	Ques.survey_submited_list(survey_id)
+	.then((Data)=>{
+		res.json(Data);
+	}).catch((err)=>res.json({'success':false,'message':'err'}));
+}
+
+module.exports.surveyuser_ans_list = (req, res, next)=>{
+	const user = req.user;
+	const user_id = req.params.user_id
+	Ques.surveyuser_ans_list(user,user_id)
 	.then((Data)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));

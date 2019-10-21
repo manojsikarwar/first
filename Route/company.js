@@ -138,3 +138,14 @@ module.exports.company_profile = (req, res, next)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));
 }
+
+module.exports.admin_user_chart = (req, res, next)=>{
+ 	const user 	= req.user;
+ 	// const id 	= req.params.id;
+ 	const body 	= req.body;
+
+	Company.admin_user_chart(user,body)
+	.then((Data)=>{
+		res.json(Data);
+	}).catch((err)=>res.json({'success':false,'message':'err'}));
+}

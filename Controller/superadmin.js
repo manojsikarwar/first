@@ -14,7 +14,7 @@ const jwt			= require('jsonwebtoken');
 module.exports.login=(email,password)=>{
 	return new Promise((resolve,reject)=>{
 		if(email != '' && password != ''){
-			const sql = `select * from registration where email ='${email}'`;
+			const sql = `select * from registration where email = '${email}'`;
 			client.query(sql,(err,result)=>{
 				if(result.rows == ''){
 					const Data = {
@@ -227,10 +227,7 @@ module.exports.create_company = (super1,body) => {
 			const status 			= 0;
 
 			if(super1 == 1){
-				if(company_name != '' && company_name != '' && company_address != '' 
-				    && company_phone != '' && country != '' && business_types != '' 
-				    && role != '' && job_level != '' && survey != '' && create_by != '' 
-				    && email != '' && password != '' && role_id != ''){
+				if(company_name != '' && company_name != '' && company_address != '' && company_phone != '' && country != '' && business_types != '' && role != '' && job_level != '' && survey != '' && create_by != '' && email != '' && password != '' && role_id != ''){
 		 	
 					const sql1 = `select * from create_company where comp_email = '${email}'`;
 					client.query(sql1,(err,ress1)=>{
@@ -241,13 +238,8 @@ module.exports.create_company = (super1,body) => {
 							}
 							resolve(Data);
 						}else{
-							const sql = `insert into create_company(company_name,company_address,
-							company_phone,country,business_types,role,job_level,survey,create_by,
-							comp_email,password,role_id,status) 
-							values(
-							'${company_name}','${company_address}','${company_phone}','${country}',
-							'${business_types}','${role}','${job_level}','${survey}','${create_by}',
-							'${email}','${pass}','${role_id}','${status}')RETURNING company_id`;
+							const sql = `insert into create_company(company_name,company_address,company_phone,country,business_types,role,job_level,survey,create_by,comp_email,password,role_id,status) 
+							values('${company_name}','${company_address}','${company_phone}','${country}','${business_types}','${role}','${job_level}','${survey}','${create_by}','${email}','${pass}','${role_id}','${status}')RETURNING company_id`;
 							client.query(sql,(err,ress)=>{
 								if(err){
 									const Data = {
@@ -257,15 +249,9 @@ module.exports.create_company = (super1,body) => {
 									resolve(Data);
 								}else{
 									const company_id = ress.rows[0].company_id;
-									const sql2 = `insert into registration(first_name,email,password,
-									role_id,role_type,super_id,create_by,last_name,confirm_password,
-									company_name,company_id,status)
-										values(
-										'${first_name}','${email}','${hash}','${role_id}','${role_type}',
-										'${super_id}','${create_by}','${last_name}','${confirm_password}',
-										'${company_name}','${company_id}','${status}'
+									const sql2 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
+										values('${first_name}','${email}','${hash}','${role_id}','${role_type}','${super_id}','${create_by}','${last_name}','${confirm_password}','${company_name}','${company_id}','${status}'
 										) `;
-										console.log(sql2)
 									client.query(sql2,(err,ress2)=>{
 										if(err){
 											const Data = {
@@ -407,10 +393,7 @@ module.exports.super_forget_password = (email) => {
 				                   resolve(Data)
 				                }else{
 				                	password = hash;
-					                const sql2 = `update registration set 
-					                password='${password}' 
-					                where super_id= ${key.super_id}`;
-
+					                const sql2 = `update registration set password='${password}' where id= ${key.id}`;
 					                 client.query(sql2,(err,result1)=>{
 					                 	if(err)
 					                 	{
@@ -422,7 +405,7 @@ module.exports.super_forget_password = (email) => {
 					                 	}
 					                    const Data = {
 					                    	"success" : true,
-					                    	'message':'password Change Successfully',
+					                    	'message':'New Password Send In Your Mail',
 					                    	'new password':pass
 					                    }
 					                    resolve(Data)
@@ -472,10 +455,7 @@ module.exports.super_change_password = (user,body) => {
 			    			resolve(Data)
 			    		}else{
 			    			if(bcrypt.compareSync(oldpassword, cpass)){
-							 	const sql = `update registration set 
-							 	password = '${hash}',
-							 	confirm_password = '${hash}'
-							 	where id ='${id}' `;
+							 	const sql = `update registration set password = '${hash}',confirm_password = '${hash}'where id ='${id}' `;
 								client.query(sql,(err,result)=>{
 									if(err){
 										const Data = {
@@ -527,11 +507,7 @@ module.exports.profle_update = (user,body) => {
 	    const role_id 	= user.role_id;
 
 	    if(role_id == 1){
-	   		const sql = `update registration set 
-	   		first_name = '${body.first_name}',
-	   		last_name = '${body.last_name}',
-	   		email = '${body.email}'
-	   		where id ='${id}' `;
+	   		const sql = `update registration set first_name = '${body.first_name}',last_name = '${body.last_name}',email = '${body.email}' where id ='${id}' `;
 			client.query(sql,(err,result)=>{
 				if(err){
 					const Data = {

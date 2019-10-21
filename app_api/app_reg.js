@@ -172,7 +172,7 @@ var sendEmailToCustomer = (email, password) => {
 			if (error) {
 				reject(error);
 			}
-			resolve(info)
+			resolve(info);
 		});
 	});
 }
@@ -180,69 +180,69 @@ var sendEmailToCustomer = (email, password) => {
 module.exports.forget_password = (email) => {
 	return new Promise((resolve,reject)=>{
 		if(email != ''){
-		const sql = `select * from registration where email = '${email}'`;
-		client.query(sql,(err,result)=>{
-			if(result.rows != ''){
-				for(let key of result.rows){
-				var password = generator.generate({
-	                length: 10,
-	                numbers: true
-	            });
-				bcrypt.genSalt(10, function(err,salt){
-	          	if(err){
-	               const Data = {
-	               	"success" : false,
-	               	'message':'password not generate'
-	               }
-	               resolve(Data)
-	          	}
-	            bcrypt.hash(password,salt,function(err,hash){
-	                if(err){
-	                   const Data = {
-	                   	"success" : false,
-	                   	'message':'someting went wrong'
-	                   }
-	                   resolve(Data)
-	                }else{
-	                	password = hash;
-		                const sql2 = `update registration set 
-		                password='${password}' 
-		                where super_id= ${key.super_id}`;
+			const sql = `select * from registration where email = '${email}'`;
+			client.query(sql,(err,result)=>{
+				if(result.rows != ''){
+					for(let key of result.rows){
+					var password = generator.generate({
+		                length: 10,
+		                numbers: true
+		            });
+					bcrypt.genSalt(10, function(err,salt){
+		          	if(err){
+		               const Data = {
+		               	"success" : false,
+		               	'message':'password not generate'
+		               }
+		               resolve(Data);
+		          	}
+		            bcrypt.hash(password,salt,function(err,hash){
+		                if(err){
+		                   const Data = {
+		                   	"success" : false,
+		                   	'message':'someting went wrong'
+		                   }
+		                   resolve(Data)
+		                }else{
+		                	password = hash;
+			                const sql2 = `update registration set 
+			                password='${password}' 
+			                where id= ${key.id}`;
 
-		                 client.query(sql2,(err,result1)=>{
-		                 	if(err)
-		                 	{
-		                 		const Data = {
-		                 			"success" : false,
-		                 			'message':'Sorry Try Again'
-		                 		}
-		                 		resolve(Data)
-		                 	}
-	                    const Data = {
-	                    	"success" : true,
-	                    	'message':'password Change Successfully'
-	                    }
-	                    resolve(Data)
-	                 })
-	                }
-	            });
-	            sendEmailToCustomer(email,password)
-	        });		
-	        }	
-			}else{
-				const Data = {
-					"success" : false,
-					"message":'Email not Found'
+			                 client.query(sql2,(err,result1)=>{
+			                 	if(err)
+			                 	{
+			                 		const Data = {
+			                 			"success" : false,
+			                 			'message':'Sorry Try Again'
+			                 		}
+			                 		resolve(Data);
+			                 	}
+		                    const Data = {
+		                    	"success" : true,
+		                    	'message':'password Change Successfully'
+		                    }
+		                    resolve(Data);
+		                 })
+		                }
+		            });
+		            sendEmailToCustomer(email,password);
+		        });		
+		        }	
+				}else{
+					const Data = {
+						"success" : false,
+						"message":'Email not Found'
+					}
+					resolve(Data);
 				}
-				resolve(Data)
+			})
+		}else{
+			const Data = {
+				"success":false,
+				"message":"Please Give Email"
 			}
-		})
-	}else{
-		const Data = {
-			"success":false,
-			"message":"Please Give Email"
+			resolve(Data);
 		}
-		resolve(Data)
-	}
 	})
 }
