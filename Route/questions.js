@@ -61,8 +61,8 @@ module.exports.survey_submited_list = (req, res, next)=>{
 
 module.exports.surveyuser_ans_list = (req, res, next)=>{
 	const user = req.user;
-	const user_id = req.params.user_id
-	Ques.surveyuser_ans_list(user,user_id)
+	const body = req.body;
+	Ques.surveyuser_ans_list(user,body)
 	.then((Data)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));

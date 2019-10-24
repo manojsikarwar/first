@@ -247,57 +247,6 @@ module.exports.manager_update_profile = (user,body) => {
 	})
 }
 
-// =================== user_list ================
-//get
-module.exports.user_list = (role_id) => {
-	return new Promise((resolve,reject)=>{
-		if(role_id == 3 || role_id == 1 || role_id == 2){
-			const sql1 = `select * from registration where role_id = '${4}'`
-			client.query(sql1,(err,ress1)=>{
-				if(err){
-					const Data = {
-						"success":false,
-						"message":"Something went wrong"
-					}
-					resolve(Data)
-				}else{
-					//console.log(ress1.rows);
-					if(ress1.rows==''){
-					const Data = {
-						"success":false,
-						"message":"not found manager"
-					}
-					resolve(Data)
-					}else{
-						const data = [];
-						for(let key of ress1.rows){
-						var alldata = {
-							id 			:key.id,
-							first_name 	:key.first_name,
-							last_name   :key.last_name,
-							email 		:key.email,
-							role 		:key.role_type,
-							create_by	:key.create_by
-						};
-						data.push(alldata)
-					}
-					const Data = {
-						"success":true,
-						"data":data
-					}
-					resolve(Data)
-					}
-				}
-			})
-		}else{
-			const Data = {
-				"success" : false,
-				"message":"Only Manager and superadmin Have Permission"
-			}
-			resolve(Data)
-		}
-	})
-}
 
 
  // ==================  manager_delete_user  ====================

@@ -36,7 +36,7 @@ app.use((req, res, next) => {
         if (token) {
             return jwt.verify(token,'secret', (err, userData) => {  
                 if(err){
-                     res.sendStatus(403);
+                     res.status(401).json('Please login');
                 }else{
                     req.user = {
                         id      : userData.id,
@@ -60,7 +60,7 @@ app.use((req, res, next) => {
 //======================== check api for heroku link ========================
 
 app.get('/',(req, res) => {
-    res.send("API is running");
+    res.status(400).send("API is running");
 })
 
 app.use('/api',api);

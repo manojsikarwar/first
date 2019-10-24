@@ -149,3 +149,11 @@ module.exports.admin_user_chart = (req, res, next)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));
 }
+
+module.exports.country_list = (req, res, next)=>{
+
+	Company.country_list()
+	.then((Data)=>{
+		res.json(Data);
+	}).catch((err)=>res.json({'success':false,'message':'err'}));
+}

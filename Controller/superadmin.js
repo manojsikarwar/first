@@ -6,7 +6,91 @@ const moment 		= require('moment');
 const date   		= new Date();
 const myDate 		= moment(date).format('lll');
 const jwt			= require('jsonwebtoken');
+// const status = 400;?
 
+// ================== superadmin_registration ==============
+//post
+module.exports.superadmin_registration = (user,body) => {
+	return new Promise((resolve,reject)=>{
+		try{
+			const password			= body.password;
+			bcrypt.hash(password,10,function(err,hash){
+			const id 				= user.role_id;
+			const company_name 		= 'none';
+			const company_id 		= 0;
+			const first_name 	 	= body.first_name;
+			const email 			= body.email;
+			const pass 				= hash;
+			const role_type 		= 'superdmin';
+			const super_id 			= '1';
+			const create_by 		= 'superdmin';
+			const last_name 	 	= body.last_name;
+			const confirm_password 	= 'none';
+			const status 			= 0;
+			if(id == 1){
+				if(first_name != '' && email != '' && password != '' && role_type != ''&& super_id != '' && create_by != '' && last_name != ''){
+					if(role_type == 'manager' || role_type == 'admin' || role_type == 'user' ){
+					const sql = `select * from registration where email = '${email}'`;
+					client.query(sql,(err,ress)=>{
+						if(ress.rows != ''){
+							const Data = {
+								"success":false,
+								"message":'Sorry This Email Already Created'
+							}
+							resolve(Data)
+						}else{
+							if(role_type == 'superdmin'){
+								const sql1 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
+								values('${first_name}','${email}','${pass}','${3}','${role_type}','${super_id}','${create_by}','${last_name}','${hash}','${company_name}','${company_id}','${status}')`;
+								client.query(sql1,(err1,ress1)=>{
+						 			if(err){
+										const Data = {
+											'success':false,
+											'message':'Something went wrong'
+										}
+						 			}else{
+										const Data = {
+											'success':true,
+											'message':'create manager account Successfully'
+										}
+										resolve(Data)
+						 			}
+								})
+							}
+						}
+					})
+			
+					}else{
+						const Data = {
+							'success':false,
+							'message':'you can create Only superadmin'
+						}
+						resolve(Data)
+					}
+				}else{
+					const Data = {
+						'success':false,
+						'message':'some field are missing'
+					}
+					resolve(Data)
+				}	
+			}else{
+				const Data = {
+					'success':false,
+					'message':'You have not permission to create superadmin'
+				}
+				resolve(Data)
+			}
+			})
+		}catch(error){
+			const Data = {
+				'status':false,
+				'message':error
+			}	
+			resolve(Data)		
+		}
+	})
+}
 
 // ================= login =========================
 //post
@@ -14,7 +98,7 @@ const jwt			= require('jsonwebtoken');
 module.exports.login=(email,password)=>{
 	return new Promise((resolve,reject)=>{
 		if(email != '' && password != ''){
-			const sql = `select * from registration where email = '${email}'`;
+			const sql = `select * from registration where trim(email) = '${email}'`;
 			client.query(sql,(err,result)=>{
 				if(result.rows == ''){
 					const Data = {
@@ -43,15 +127,18 @@ module.exports.login=(email,password)=>{
 							                	const Data = {
 							                    'success': true,
 							                    'message': "Login Successfuly of Super Admin",
+							               	  	'Status' : 200,
 							                    'token': token,
 							                    'data': key
 							               	 }
 							               	 resolve(Data)
 							    		}else{
-							    				const Data = {
+							    			const Data = {
 							                    'success': false,
-							                    'message': "Password incorrect"
+							                    'message': "Password incorrect",
+							                    'Status' : 400
 							               	 }
+
 							               	 resolve(Data)
 							    		}
 							    	});
@@ -81,6 +168,7 @@ module.exports.login=(email,password)=>{
 							                	const Data = {
 							                    'success': true,
 							                    'message': "Login Successfuly of Admin",
+							                    'Status' : 200,
 							                    'token': token,
 							                    'data': key
 							               	 }
@@ -118,6 +206,7 @@ module.exports.login=(email,password)=>{
 							                	const Data = {
 							                    'success': true,
 							                    'message': "Login Successfuly of Manager",
+							                    'Status' : 200,
 							                    'token': token,
 							                    'data': key
 							               	 	}
@@ -157,6 +246,7 @@ module.exports.login=(email,password)=>{
 							                	const Data = {
 							                    'success': true,
 							                    'message': "Login Successfuly of User",
+							                    'Status' : 200,
 							                    'token': token,
 							                    'data': key
 							               	 }
@@ -583,4 +673,57 @@ module.exports.super_delete_costumer = (role_id,id) => {
 		}
 	})
 }
+
+// =================== user_list ================
+//get
+module.exports.user_list = (role_id) => {
+	return new Promise((resolve,reject)=>{
+		if(role_id == 1){
+			const sql1 = `select * from user_entery`
+			client.query(sql1,(err,ress1)=>{
+				if(err){
+					const Data = {
+						"success":false,
+						"message":"Something went wrong"
+					}
+					resolve(Data)
+				}else{
+					//console.log(ress1.rows);
+					if(ress1.rows==''){
+					const Data = {
+						"success":false,
+						"message":"not found user"
+					}
+					resolve(Data)
+					}else{
+						const data = [];
+						for(let key of ress1.rows){
+						var alldata = {
+							id 			:key.id,
+							first_name 	:key.first_name,
+							last_name   :key.last_name,
+							email 		:key.email,
+							role 		:key.role_type,
+							created_by	:key.created_by
+						};
+						data.push(alldata)
+					}
+					const Data = {
+						"success":true,
+						"data":data
+					}
+					resolve(Data)
+					}
+				}
+			})
+		}else{
+			const Data = {
+				"success" : false,
+				"message":"Only superadmin Have Permission"
+			}
+			resolve(Data)
+		}
+	})
+}
+
 

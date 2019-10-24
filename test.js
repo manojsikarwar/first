@@ -71,3 +71,20 @@ module.exports.complete_survey = (body) =>{
 	})
 }*/
 
+const sql1 = `insert into user_entery(first_name,last_name,email,password,company_id,company_name,created_by,role_id,role_type,status)
+								values('${first_name}','${last_name}','${email}','${hash}','${company_id}','${company_name}','${created_by}','${4}','${role_type}','${status}')`;
+								client.query(sql1,(err,ress1)=>{
+									if(err){
+										const Data = {
+											"success":false,
+											"message":'Sorry This Email Already Exists'
+										}
+										resolve(Data);
+									}else{
+										const Data = {
+											"success":true,
+											"message":'create user account Successfully'
+										}
+										resolve(Data);
+									}
+								});	

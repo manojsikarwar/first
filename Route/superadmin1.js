@@ -5,7 +5,6 @@ const Super = require('../Controller/superadmin');
 module.exports.login = (req, res, next)=>{
 	const email = req.body.email;
 	const password = req.body.password 
-      //console.log(email,password)
 	Super.login(email,password)
 	.then((Data)=>{
 		res.json(Data);
@@ -67,6 +66,25 @@ module.exports.super_delete_costumer = (req, res, next)=>{
 	const id 		= req.body.id;
 
 	Super.super_delete_costumer(role_id,id)
+	.then((Data)=>{
+		res.json(Data);
+	}).catch((err)=>res.json({'success':false,'message':'err'}));
+}
+
+module.exports.user_list = (req, res, next)=>{
+	const role_id = req.user.role_id;
+
+	Super.user_list(role_id)
+	.then((Data)=>{
+		res.json(Data);
+	}).catch((err)=>res.json({'success':false,'message':'err'}));
+}
+
+module.exports.superadmin_registration = (req, res, next)=>{
+	const body = req.user;
+	const user = req.body;
+
+	Super.superadmin_registration(user,body)
 	.then((Data)=>{
 		res.json(Data);
 	}).catch((err)=>res.json({'success':false,'message':'err'}));

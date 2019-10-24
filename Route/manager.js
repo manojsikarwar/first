@@ -40,14 +40,7 @@ module.exports.manager_update_profile = (req, res, next)=>{
 	}).catch((err)=>res.json({'success':false,'message':'err'}));
 }
 
-module.exports.user_list = (req, res, next)=>{
-	const role_id = req.user.role_id;
 
-	Manager.user_list(role_id)
-	.then((Data)=>{
-		res.json(Data);
-	}).catch((err)=>res.json({'success':false,'message':'err'}));
-}
 
 module.exports.manager_delete_user = (req, res, next)=>{
  	const id 		= req.body.id;

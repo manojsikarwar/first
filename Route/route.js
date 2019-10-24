@@ -24,7 +24,8 @@ router.post('/super_forget_password',Superadmin.super_forget_password);
 router.post('/super_change_password',[userAuthenticator],Superadmin.super_change_password);
 router.put('/profle_update',[userAuthenticator],Superadmin.profle_update);
 router.delete('/super_delete_costumer',[userAuthenticator],Superadmin.super_delete_costumer);
-
+router.get('/user_list',[userAuthenticator],Superadmin.user_list);
+router.get('/superadmin_registration',[userAuthenticator],Superadmin.superadmin_registration);
 
 // ===================  Admin  =================================
 
@@ -41,7 +42,6 @@ router.post('/costumer_manager_reg',Manager.costumer_manager_reg);
 router.get('/manager_profile',[userAuthenticator],Manager.manager_profile);
 router.post('/manager_change_password',[userAuthenticator],Manager.manager_change_password);
 router.put('/manager_update_profile',[userAuthenticator],Manager.manager_update_profile);
-router.get('/user_list',[userAuthenticator],Manager.user_list);
 router.delete('/manager_delete_user',[userAuthenticator],Manager.manager_delete_user);
 
 
@@ -77,6 +77,7 @@ router.get('/company_admin_dashboard',[userAuthenticator],Company.company_admin_
 router.post('/company_add_user',[userAuthenticator],Company.company_add_user);
 router.get('/company_profile',[userAuthenticator],Company.company_profile);
 router.post('/admin_user_chart',[userAuthenticator],Company.admin_user_chart);
+router.get('/country_list',Company.country_list);
 
 // ==================== company managers ====================
 
@@ -96,7 +97,7 @@ router.get('/total_survey',[userAuthenticator],Survey.total_survey);
 router.post('/submit_answer',Survey.submit_answer);
 router.get('/survey_details/:id',Survey.survey_details);
 router.get('/survey_submited_list/:survey_id',Survey.survey_submited_list);
-router.get('/surveyuser_ans_list/:user_id',Survey.surveyuser_ans_list);
+router.post('/surveyuser_ans_list',Survey.surveyuser_ans_list);
 // router.get('/complete_survey',Survey.complete_survey)
 router.get('/example', Survey.example);
 

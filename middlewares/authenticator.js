@@ -7,7 +7,7 @@ module.exports.userAuthenticator = (req, res, next) => {
         });
     } 
     if (req.user && (req.user.exp < (new Date().getTime() / 1000))) {
-        return res.status(401).json({
+        return res.status(Forbidden).json({
             message: 'User Token Expire'
         });
     } else {

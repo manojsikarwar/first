@@ -27,21 +27,22 @@ module.exports.company_create_module = (user,body) => {
 			const last_name 	 	= body.last_name;
 			const confirm_password 	= 'none';
 			const status 			= 0;
+			const created_by 		= user.id;
 			if(id == 2){
 				if(first_name != '' && email != '' && password != '' && role_type != ''&& super_id != '' && create_by != '' && last_name != ''&& company_id != ''){
 					if(role_type == 'manager' || role_type == 'admin' || role_type == 'user' ){
-					const sql = `select * from registration where company_id = '${company_id}' and email = '${email}'`;
+					const sql = `select * from registration where email = '${email}'`;
 					client.query(sql,(err,ress)=>{
 						if(ress.rows != ''){
 							const Data = {
 								"success":false,
-								"message":'Sorry This Email Already Created by This Company'
+								"message":'Sorry This Email Already Created by Company'
 							}
 							resolve(Data)
 						}else{
 							if(role_type == 'manager'){
 								const sql1 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
-								values('${first_name}','${email}','${hash}','${3}','${role_type}','${super_id}','${create_by}','${last_name}','${hash}','${company_name}','${company_id}','${status}')`;
+								values('${first_name}','${email}','${pass}','${3}','${role_type}','${super_id}','${create_by}','${last_name}','${confirm_password}','${company_name}','${company_id}','${status}')`;
 								client.query(sql1,(err1,ress1)=>{
 						 			if(err){
 										const Data = {
@@ -51,7 +52,7 @@ module.exports.company_create_module = (user,body) => {
 						 			}else{
 										const Data = {
 											'success':true,
-											'message':'create account Successfully'
+											'message':'create manager account Successfully'
 										}
 										resolve(Data)
 						 			}
@@ -59,7 +60,7 @@ module.exports.company_create_module = (user,body) => {
 							}
 							if(role_type == 'admin'){
 								const sql1 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
-								values('${first_name}','${email}','${hash}','${2}','${role_type}','${super_id}','${create_by}','${last_name}','${hash}','${company_name}','${company_id}','${status}')`;
+								values('${first_name}','${email}','${hash}','${2}','${role_type}','${super_id}','${create_by}','${last_name}','${confirm_password}','${company_name}','${company_id}','${status}')`;
 								client.query(sql1,(err1,ress1)=>{
 						 			if(err){
 										const Data = {
@@ -69,29 +70,45 @@ module.exports.company_create_module = (user,body) => {
 						 			}else{
 										const Data = {
 											'success':true,
-											'message':'create account Successfully'
+											'message':'create admin account Successfully'
 										}
 										resolve(Data)
 						 			}
 								})
 							}
 							if(role_type == 'user'){
-								const sql1 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
-								values('${first_name}','${email}','${hash}','${4}','${role_type}','${super_id}','${create_by}','${last_name}','${hash}','${company_name}','${company_id}','${status}')`;
-								client.query(sql1,(err1,ress1)=>{
-						 			if(err){
-										const Data = {
-											'success':false,
-											'message':'Something went wrong'
-										}
-						 			}else{
-										const Data = {
-											'success':true,
-											'message':'create account Successfully'
-										}
-										resolve(Data)
-						 			}
-								})
+								const user = `select * from user_entery where company_id = '${company_id}' and created_by = '${created_by}' and email = '${email}' `
+							client.query(user,(err,userress)=>{
+								if(userress.rows == ''){
+									// resolve('found')
+									const sql1 = `insert into user_entery(first_name,last_name,email,password,company_id,company_name,created_by,role_id,role_type,status)
+										values('${first_name}','${last_name}','${email}','${hash}','${company_id}','${company_name}','${created_by}','${4}','${role_type}','${status}')`;
+										console.log(sql1)											
+										client.query(sql1,(err,ress1)=>{
+											if(err){
+												const Data = {
+													"success":false,
+													"message":'Sorry This Email Already Exists'
+												}
+												resolve(Data);
+											}else{
+												const Data = {
+													"success":true,
+													"message":'User create Successfully'
+												}
+												resolve(Data);
+											}
+										});			
+								
+								}else{
+										const userData = {
+										'success':false,
+										'message':'already create this user by this company'
+									}
+									resolve(userData)
+								}
+							})
+								
 							}
 						}
 					})
@@ -323,9 +340,8 @@ module.exports.company_user_list = (user,company_id) => {
 			const Array = []
 			if(role_id == 2 || role_id == 1 || role_id == 3){
 				if(company_id != ''){
-			 		const sql1 = `select company_id from registration where company_id = '${company_id}' and status = '${0}' `;
+			 		const sql1 = `select company_id from user_entery where company_id = '${company_id}' and status = '${0}' `;
 			 		client.query(sql1,(err,ress)=>{
-			 			// resolve(ress.rows)
 			 			if(ress.rows == ''){
 			 				const Data = {
 			 					'success':false,
@@ -344,7 +360,7 @@ module.exports.company_user_list = (user,company_id) => {
 				 				for(let key of ress.rows){
 				 					id = key.company_id;
 				 				}
-				 				const user = `select * from registration where company_id = '${id}' and role_id = '${4}' and status = '${0}' `
+				 				const user = `select * from user_entery where company_id = '${id}' and role_id = '${4}' and status = '${0}' `
 				 				client.query(user,(err,userress)=>{
 				 					if(err){
 				 						const userData = {
@@ -363,17 +379,16 @@ module.exports.company_user_list = (user,company_id) => {
 											const data = [];
 											for(let key of userress.rows ){
 												var alldata = {
-													id 			:key.id,
+													id 			:key.user_id,
 													first_name	:key.first_name,
 													last_name 	:key.last_name,
 													email 		:key.email,
 													role 		:key.role_type,
 													company_name:key.company_name,
 													company_id  :key.company_id,
-													create_by   :key.create_by
+													created_by   :key.created_by
 												};
 												data.push(alldata);
-										
 											}
 											const Data = {
 												"success":true,
@@ -985,20 +1000,18 @@ module.exports.company_profile = (user) => {
 module.exports.company_add_user = (body,user) => {
 	return new Promise((resolve,reject)=>{
 		try{
+			const first_name 	 	= body.first_name;
+			const last_name 	 	= body.last_name;
+			const email 			= body.email;
 			const company_name 		= user.company_name;
 			const company_id 		= user.company_id;
-			const role_id1 			= user.role_id;
-			const id 				= user.id
-			const first_name 	 	= body.first_name;
-			const email 			= body.email;
+			const created_by		= user.id;
 			const role_id 			= '4';
 			const role_type 		= 'user';
-			const create_by 		= user.role_type;
-			const last_name 	 	= body.last_name;
-			const confirm_password 	= 'none';
 			const status 			= 0;
+			const role_id1 			= user.role_id;
 			if(role_id1 == 2 || role_id1 == 3){
-				const user1 = `select * from registration where email = '${email}' and super_id = '${id}'`
+				const user1 = `select * from user_entery where email = '${email}' and created_by = '${created_by}' and company_id = '${company_id}' `
 				client.query(user1, (err, userress) => {
 					if(err){
 						const userData = {
@@ -1007,8 +1020,8 @@ module.exports.company_add_user = (body,user) => {
 						}
 						resolve(userData)
 					}else{
-						if(userress.rows ==''){
-							if(first_name != '' && email != '' && create_by != '' && last_name != ''){
+						if(userress.rows == ''){
+							if(first_name != '' && email != '' && last_name != ''){
 								var password = generator.generate({
 					                length: 10,
 					                numbers: true
@@ -1022,32 +1035,34 @@ module.exports.company_add_user = (body,user) => {
 						               resolve(Data)
 						          	}
 									bcrypt.hash(password,10,function(err,hash){
+							
 										// if(role_id == 4){
-										const sql1 = `insert into registration(first_name,email,password,role_id,role_type,super_id,create_by,last_name,confirm_password,company_name,company_id,status)
-										values('${first_name}','${email}','${hash}','${role_id}','${role_type}','${id}','${create_by}','${last_name}','${confirm_password}','${company_name}','${company_id}','${status}')`;
+										const sql1 = `insert into user_entery(first_name,last_name,email,password,company_id,company_name,created_by,role_id,role_type,status)
+										values('${first_name}','${last_name}','${email}','${hash}','${company_id}','${company_name}','${created_by}','${role_id}','${role_type}','${status}')`;
+										console.log(sql1)											
 										client.query(sql1,(err,ress1)=>{
 											if(err){
 												const Data = {
 													"success":false,
 													"message":'Sorry This Email Already Exists'
 												}
-												resolve(Data)
+												resolve(Data);
 											}else{
 												const Data = {
 													"success":true,
 													"message":'Registation Successfully'
 												}
-												resolve(Data)
+												resolve(Data);
 											}
 										});				
-								})
+									})
 								})
 							}else{
 								const Data = {
 									"success":false,
 									"message":"Please fill All Field"
 								}
-								resolve(Data)
+								resolve(Data);
 							}
 						}else{
 							const Data = {
@@ -1147,3 +1162,44 @@ module.exports.admin_user_chart = (user,body) => {
 		}
 	})
 }
+
+//=====================  country_list  =========================
+//get
+
+module.exports.country_list = () => {
+	return new Promise((resolve,reject)=>{
+		try{
+			   	const sql = `select * from country `;
+				client.query(sql,(err,ress)=>{
+					if(err){
+						const Data = {
+							"success":false,
+							"message":"Something Went Wrong"
+						}
+						resolve(Data)
+					}else{
+						if(ress.rows == ''){
+							const Data = {
+							'success':false,
+							'data':'country not found'
+						}
+							resolve(Data)	
+						}else{
+							const Data = {
+								'success':true,
+								'data': ress.rows
+							}
+							resolve(Data)
+						}
+					}
+			 	})
+		    }catch(error){
+			const Data = {
+				'status':false,
+				'message':error
+			}	
+			resolve(Data);
+		}
+	})
+}
+

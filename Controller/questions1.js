@@ -44,7 +44,6 @@ module.exports.insert = (body, user) => {
         try {
             const role_id = user.role_id;
             const company_id = user.company_id;
-            const id = user.id;
             var title
             var desc1
             var question_count
@@ -81,12 +80,14 @@ module.exports.insert = (body, user) => {
             desc1 = body.description;
             start_date = body.startDate;
             end_date = body.endDate;
+            admin_id = body.adminId;
+            manager_id = body.managerId;
 
             question_count = body.questions.length;
             invited_users_count = body.users.length;
             if (role_id == 2 || role_id == 3) {
-                const sql = `insert into research(title,desc1,question_count,invited_users_count,start_date,final_date,created_at,survey_submited,id,company_id) 
-					 values('${title}','${desc1}','${question_count}','${invited_users_count}','${start_date}','${end_date}','${created_at}','${survey_submited}','${id}','${company_id}') RETURNING res_id`;
+                const sql = `insert into research(title,desc1,question_count,invited_users_count,start_date,final_date,created_at,survey_submited,id,company_id,admin_id) 
+					 values('${title}','${desc1}','${question_count}','${invited_users_count}','${start_date}','${end_date}','${created_at}','${survey_submited}','${manager_id}','${company_id}','${admin_id}') RETURNING res_id`;
                 client.query(sql, (err, ress) => {
                     if (err) {
                         const Data = {
@@ -109,7 +110,7 @@ module.exports.insert = (body, user) => {
                                     resolve(Data)
                                 } else {
                                     let invited_id = ress6.rows[0].id;
-                                    const userName = `select first_name,last_name from registration where id = '${user_id}' `
+                                    const userName = `select first_name,last_name from user_entery where user_id = '${user_id}' `
                                     client.query(userName, (err, userNameress) => {
                                         if (err) {
                                             const Data = {
@@ -145,8 +146,9 @@ module.exports.insert = (body, user) => {
                                             }
                                         }
                                     })
-                                    const sql7 = `select email, first_name from registration where id = '${user_id}'`
+                                    const sql7 = `select email, first_name from user_entery where user_id = '${user_id}'`
                                     client.query(sql7, (err, ress7) => {
+                                    console.log(ress7.rows)
                                         if (err) {
                                             const Data = {
                                                 'success': false,
@@ -302,7 +304,7 @@ module.exports.example = (body) => {
 module.exports.survey_details = (id) => {
         return new Promise((resolve, reject) => {
             try {
-                const sql = `select r.email, r.first_name, i.user_id,i.id, s.res_id,s.title, s.desc1, s.start_date, s.final_date, ss.status from invited_user as i inner join registration as r on i.user_id = r.id inner join research s on i.survey_id=s.res_id inner join survey_status as ss on i.id = ss.invited_id where i.id = '${id}' `
+                const sql = `select r.email, r.first_name, i.user_id,i.id, s.res_id,s.title, s.desc1, s.start_date, s.final_date, ss.status from invited_user as i inner join user_entery as r on i.user_id = r.user_id inner join research s on i.survey_id=s.res_id inner join survey_status as ss on i.id = ss.invited_id where i.id = '${id}' `
                 client.query(sql, async(err, ress) => {
                     if (err) {
                         const Data = {
@@ -391,7 +393,6 @@ module.exports.submit_answer = (body) => {
                 const invited_id = body.invited_id;
                 const user_id = body.user_id;
                 const created_at = myDate;
-
                 for (let ques of body.survey) {
                     const q_id = ques.q_id;
                     const answer = ques.answer;
@@ -506,13 +507,15 @@ module.exports.survey_submited_list = (survey_id) => {
 }
 
 //===================== surveyuser_ans_list =====================
-//get
-module.exports.surveyuser_ans_list = (user,user_id) => {
+//post
+module.exports.surveyuser_ans_list = (user,body) => {
     return new Promise((resolve, reject) => {
         try {
             const role_id = user.role_id;
+            const user_id = body.user_id;
+            const survey_id=body.survey_id;
             if (role_id == 4 || role_id == 2 || role_id == 3) {
-                const sql = `select s.user_id,q.question,a.answer from survey_status as s inner join answer as a on s.user_id = a.user_id inner join questions as q on q.q_id = a.question_id where s.user_id = '${user_id}' `;
+                const sql = `select s.status,s.survey_id,s.user_id,q.question,a.answer from survey_status as s inner join answer as a on s.user_id = a.user_id inner join questions as q on q.q_id = a.question_id where s.user_id = '${user_id}' and s.survey_id = '${survey_id}' `;
                 client.query(sql, async(err, ress) => {
                     if (err) {
                         const Data = {
@@ -524,15 +527,18 @@ module.exports.surveyuser_ans_list = (user,user_id) => {
                         if (ress.rows == '') {
                             const Data = {
                                 'success': false,
-                                'message': 'Survey not submited'
+                                'message': 'survey not submited'
                             }
                             resolve(Data);
                         } else {
-                            const Data = {
-                                'success': true,
-                                'data': ress.rows
+                            const status = ress.rows[0].status.trim();
+                            if(status == "true"){
+                                const Data = {
+                                    'success': true,
+                                    'data': ress.rows
+                                }
+                                resolve(Data);
                             }
-                            resolve(Data);
                         }
                     }
                 })
